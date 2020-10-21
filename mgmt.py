@@ -28,6 +28,7 @@ menu_item = [	["Run all checks",				"mgmt.check_all(True)"],
 		["Check Malware Classification Mode",		"mgmt.mgmt_check_malware_classification(True)"],
 		["Check ICA / Certificates: SIC",		"mgmt.mgmt_check_ica_certs('SIC', True)"],
 		["Check ICA / Certificates: IKE",		"mgmt.mgmt_check_ica_certs('IKE', True)"],
+		["Check IPS performance intensive pattern",	"mgmt.mgmt_check_ips_performance(True)"],
                 ["Back to Main Menu",	 			"menu_set('main')"]]
 
 results = []
@@ -151,7 +152,7 @@ def mgmt_check_malware_classification(printRes = False):
 				state = "PASS"
 			if (service == "http" or service == "smb" or service == "smtp" or service == "ftp") and action == "policy":
 				state = "PASS"
-			results.append([title + " [Service: " + service + "]", action, state, "Thread Prevention"])
+			results.append([title + " [Service: " + service + "]", action, state, "Threat Prevention"])
 	if printRes:
 		print_results()
 
@@ -286,6 +287,71 @@ def mgmt_check_vpn_prop_ras_item(val, unwanted):
 	return (txt, state)
 			
 
+def mgmt_api_fetcher(cmd, loopobj = ""):
+	results = []
+	logme.loader()
+	last = 0
+	moreData = True
+	pager = ""
+	while moreData:
+		logme.loader()
+		if loopobj != "":
+			pager = " limit 50 offset " + str(last)
+		out, err = func.execute_command("mgmt_cli -r true " + cmd + pager + " --format json")
+		logme.loader()
+		data = json.load(out)
+		if 'to' in data:
+			if data['to'] >= data['total']:
+				moreData = False
+			else:
+				last = data['to']
+		else:
+			moreData = False
+		if loopobj != "":
+			for o in data[loopobj]:
+				logme.loader()
+				results.append(o)
+		else:
+			return data
+	return results
+
+
+def mgmt_check_ips_performance(printRes = False):
+	global results
+	title = "Checking IPS performance intensive pattern"
+	logme.loader()
+	profiles = []
+	impact = ["high", "critical"]
+	# Fetching Threat-Layers
+	tp_layer = mgmt_api_fetcher('show threat-layers', 'threat-layers')
+	for layer in tp_layer:
+		logme.loader()
+		tp_rules = mgmt_api_fetcher('show threat-rulebase uid ' + layer['uid'] + ' use-object-dictionary false', 'rulebase')
+		for rule in tp_rules:
+			logme.loader()
+			tp_profile = mgmt_api_fetcher('show threat-profile uid ' + rule['action']['uid'])
+			# check for profile settings
+			if tp_profile['ips'] == True:
+				if tp_profile['active-protections-performance-impact'].lower() in impact:
+					results.append([title + " (Profile: " + rule['action']['name'] + ")", tp_profile['active-protections-performance-impact'], "WARN", "IPS"])
+				profiles.append(rule['action']['name'])
+	logme.loader()
+	# Fetching IPS Protections
+	tp_pattern = mgmt_api_fetcher('show threat-protections details-level full show-profiles true', 'protections')
+	for pattern in tp_pattern:
+		logme.loader()
+		if pattern['performance-impact'].lower() in impact:
+			logme.loader()
+			for profile in pattern['profiles']:
+				logme.loader()
+				for p in profiles:
+					logme.loader()
+					if profile['name'] == p:
+						if profile['final']['action'] != "Inactive":
+							results.append([title + " (Pattern: " + pattern['name'] + ")", profile['final']['action'], "WARN", "IPS"])
+	if printRes:
+		print_results()
+
 
 def mgmt_check_vpn_prop_ras(printRes = False):
 	global results
@@ -391,6 +457,7 @@ def check_all(printRes = False):
 	mgmt_check_malware_classification()
 	mgmt_check_ica_certs('SIC')
 	mgmt_check_ica_certs('IKE')
+	mgmt_check_ips_performance()
 	if printRes:
 		print_results()
 
