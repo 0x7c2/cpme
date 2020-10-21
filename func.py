@@ -126,18 +126,6 @@ def str_pad(val, size, fill = " ", padLeft = False):
 			tmp = tmp + fill
 	return tmp
 
-
-def confirm(cmd):
-	print("> Executing command: " + cmd)
-	a = input("> Should i really execute command? [y/N] ")
-	if a.lower() == "y":
-		os.system(cmd)
-		return True
-	else:
-		print("Aborting!")
-	return False
-
-
 def make_check_all():
 	results = []
 	gaia.check_all(False)

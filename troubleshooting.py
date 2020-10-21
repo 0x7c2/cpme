@@ -27,8 +27,6 @@ menu_item = [	["Run fw monitor with filter",		"troubleshooting.fwmonitor()"],
 		["Clear specific connections from table","troubleshooting.clear_table_input('connections')"],
 		["STOP CheckPoint Services",		"troubleshooting.run_cpstop()"],
 		["STOP CheckPoint Services and keep policy","troubleshooting.run_cpstop('-fwflag -proc')"],
-		["UNLOAD Security/TP Policy",		"troubleshooting.load_policy(False)"],
-		["FETCH  Security/TP Policy",		"troubleshooting.load_policy(True)"],
 		["Disable Antispoofing",		"troubleshooting.run_spoofing(0)"],
 		["Enable Antispoofing",			"troubleshooting.run_spoofing(1)"],
 		["ClusterXL Status",			"troubleshooting.clusterxl_status()"],
@@ -44,8 +42,6 @@ if func.isFirewall() and func.isFWUserMode():
 
 if func.isFirewall():
 	menu_item.append(["Measure kernel delay (EXPERIMENTAL!)",	"troubleshooting.fwkern_delay()"])
-	menu_item.append(["Disable IPS on the fly",	"troubleshooting.run_ips(False)"])
-	menu_item.append(["Enable  IPS on the fly",	"troubleshooting.run_ips(True)"])
 
 menu_item.append(["Print heavy conns detected by CoreXL",	"troubleshooting.print_heavy_conn()"])
 menu_item.append(["Back to Main Menu",	 		"menu_set('main')"])
@@ -234,21 +230,12 @@ def ip2hex(ipaddr):
 		return "ffffffff".lower()
 
 
-def run_ips(ena):
-	print("")
-	if ena:
-		cmd = "ips on"
-	else:
-		cmd = "ips off -n"
-	func.confirm(cmd)
-	print("")
-
-
 def run_securexl_dos():
 	print("")
 	cmd = "fwaccel dos config get ; fwaccel dos stats get"
 	print("Executing command:")
 	print(cmd)
+	print("")
 	os.system(cmd)
 	print("")
 
@@ -257,16 +244,21 @@ def run_spoofing(val):
 	print("")
 	print("Modify kernel parameters for spoofing:")
 	cmd = "fw ctl set int fw_antispoofing_enabled " + str(val)
-	func.confirm(cmd)
+	print(cmd)
+	print("")
+	os.system(cmd)
 	cmd = "fw ctl set int fw_local_interface_anti_spoofing " + str(val)
-	func.confirm(cmd)
+	print(cmd)
+	print("")
+	os.system(cmd)
 	print("")
 
 def run_cpstop(parms = ""):
 	print("")
 	print("Stopping CheckPoint Services...")
-	cmd = "cpstop " + parms
-	func.confirm(cmd)
+	print("cpstop" + parms)
+	print("")
+	os.system("cpstop" + parms)
 	print("")
 
 
@@ -320,25 +312,6 @@ def zdebug():
 	print("")
 
 
-def load_policy(ena):
-	print("")
-	if ena:
-		s = input("Enter Security Management Server IP: ")
-		cmd = "fw fetch " + s
-		print("")
-		func.confirm(cmd)
-		print("")
-		cmd = "fw amw fetch " + s
-		func.confirm(cmd)
-	else:
-		cmd = "fw unloadlocal"
-		func.confirm(cmd)
-		print("")
-		cmd = "fw amw unload"
-		func.confirm(cmd)
-		
-
-
 def fwmonitor():
 	print("Example(s) for filter string:")
 	print("host(1.1.1.1)")
@@ -352,7 +325,6 @@ def fwmonitor():
 	print(cmd)
 	print("")
 	os.system(cmd)
-
 
 def tcpdump(filter = ""):
 	if filter == "":
@@ -443,11 +415,7 @@ def clear_table_input(fwtab):
 	clear_table(fwtab, iphex_src, iphex_dst)
 
 def clear_table(fwtab, iphex_src = "", iphex_dst = ""):
-	a = input("Should i really CLEAR table? [y/N] ")
-	if a.lower() != "y":
-		print("Aborting !")
-		return False
-	out, err = func.execute_command("fw tab -t " + fwtab + " -u | awk 'NR>3 {print $1$2$3$4$5$6}' | sed 's/<//g' | sed 's/>//g' | sed 's/;//g'")
+	out = fund.execute_function("fw tab -t " + fwtab + " -u | awk 'NR>3 {print $1$2$3$4$5$6}' | sed 's/<//g' | sed 's/>//g' | sed 's/;//g'")
 	for line in out:
 		delete = False
 		conn = line.strip('\n')
