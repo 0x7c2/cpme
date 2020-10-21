@@ -38,6 +38,7 @@ if func.isFirewall():
 	menu_item.append(["Check CoreXL dispatcher stats",	"health.check_dispatcher(True)"])
 	menu_item.append(["Check CoreXL connections",	"health.check_multik_stat(True)"])
 	menu_item.append(["Check active Blades",	"health.check_blades(True)"])
+	menu_item.append(["Check protection parsers",	"health.check_parsers(True)"])
 
 if func.isFirewall() and func.isCluster():
 	menu_item.append(["Check ClusterXL state",      "health.check_clusterxl_state(True)"])
@@ -163,6 +164,19 @@ def check_mgmt_gui(printRes = False):
 		state = "WARN"
 		detail = "Any"
 	results.append([title, detail, state, "Management"])
+	if printRes:
+		print_results()
+
+
+def check_parsers(printRes = False):
+	global results
+	title = "Checking protection parsers"
+	logme.loader()
+	state = "INFO"
+	out, err = func.execute_command('cat $FWDIR/state/local/FW1/local.set | grep -A4 parser_settings_profile | grep ":val" | uniq | awk "{print $2}" | tr -d "()"')
+	for line in out:
+		logme.loader()
+		results.append([title, line.strip('\n').replace(':val ','').replace('"',''), state, "Firewall"])
 	if printRes:
 		print_results()
 
@@ -937,6 +951,7 @@ def check_all(printRes = False):
 		check_dispatcher()
 		check_multik_stat()
 		check_blades()
+		check_parsers()
 	if func.isFirewall() and func.isCluster():
 		check_clusterxl_state()
 		check_clusterxl_sync()
