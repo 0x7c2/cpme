@@ -40,7 +40,7 @@ Run command from expert mode (bash):
 
 
 ## History
-v0.22 - fixes for troubleshooting options and other small stuff
+v0.22 - fixes for troubleshooting, check ips pattern, etc.  
 v0.20 - 0.21 - some fixes for r80.40, other small stuff  
 v0.19 - measure kernel delay for routed traffic (EXPERIMENTAL!)  
 v0.16 - 0.18 - added some improvements, ica certificate checks, and much more  
