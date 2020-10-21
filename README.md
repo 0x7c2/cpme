@@ -22,24 +22,9 @@ Run command from expert mode (bash):
 Run command from expert mode (bash):   
 ```cpme --html```
 
-## Example HTML Report
-- [Example Report for Gateway](https://brecht.systems/cpme/report_gw.html)
-
-
-## some Screenshots
-<img src="https://brecht.systems/images/cpme_gaia.png">
-
-<img src="https://brecht.systems/images/cpme_health.png">
-
-<img src="https://brecht.systems/images/cpme_files.png">
-
-<img src="https://brecht.systems/images/cpme_performance.png">
-
-<img src="https://brecht.systems/images/cpme_troubleshooting.png">
-
-
 
 ## History
+v0.22 - fixes for troubleshooting options and other small stuff
 v0.20 - 0.21 - some fixes for r80.40, other small stuff  
 v0.19 - measure kernel delay for routed traffic (EXPERIMENTAL!)  
 v0.16 - 0.18 - added some improvements, ica certificate checks, and much more  

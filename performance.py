@@ -22,7 +22,6 @@ if func.isFirewall():
 	menu_item.append(["Check Modules",			"performance.check_modules(True)"])
 	menu_item.append(["Check Multi Queue",			"performance.check_multiq(True)"])
 	menu_item.append(["Check Prio Queue",			"performance.check_prioq(True)"])
-	menu_item.append(["Check ISP Redundancy",		"performance.check_ispredundancy(True)"])
 
 menu_item.append(["Back to Main Menu",	 		"menu_set('main')"])
 
@@ -51,33 +50,11 @@ def check_all(printRes = False, runAll = False):
 		check_modules()
 		check_multiq()
 		check_prioq()
-		check_ispredundancy()
 	if runAll:
 		files.check_all(False, "all")
 	results = results + files.get_results(True)
 	if printRes:
 		print_results()
-
-
-def check_ispredundancy(printRes = False):
-	global results
-	title = "ISP Redundancy"
-	out, err = func.execute_command("cpstat fw | grep -A5 'ISP link table' | grep '|'")
-	for line in out:
-		fields = line.split('|')
-		ispname = fields[1]
-		ispstatus = fields[2]
-		isprole = fields[3]
-		if ispname != "Name":
-			ipstatus = "WARN"
-			if ispstatus == "OK":
-				state = "PASS"
-			results.append([title + " (Name: " + ispname + ")", "Role: " + isprole, state, "ISP Redundancy"])
-		else:
-			results.append([title,  "disabled", "PASS", "ISP Redundancy"])
-	if printRes:
-		print_results()
-
 
 def check_cpumemif(printRes = False):
 	global results
