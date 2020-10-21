@@ -87,8 +87,18 @@ def results_remove_duplicates(res):
 
 def html_category_descrpition(cat = ""):
 	categories = {}
-	categories["Firewall"] 	= "Specific things about FireWall-1 Product"
-	categories["GAiA"]	= "Operating System related stuff"
+	categories["Firewall"] 		= "Specific things about FireWall-1 Product"
+	categories["GAiA"]		= "Operating System related stuff"
+	categories["CoreXL"]		= "CoreXL statistics, loadbalancing traffic over all configured cpus"
+	categories["Deployment Agent"]	= "Specific things from deployment agent, for example available updates"
+	categories["Filesystem"]	= "Local filesystem on this physical box"
+	categories["ClusterXL"]		= "Cluster related information"
+	categories["CPU"]		= "CPU usage, data obtained from cpview history"
+	categories["Kernel"]		= "Firewall kernel related settings"
+	categories["Licensing"]		= "Most complex topic, check poing licensing ;-)"
+	categories["Log Files"]		= "Try to find errors or any other warning in the log files"
+	categories["Memory"]		= "Memory usage and failed allocations, data obtained from cpview history"
+	categories["SecureXL"]		= "SecureXL configuration and statistics"
 	# ...
 	if cat == "":
 		return categories

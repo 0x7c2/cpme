@@ -37,11 +37,13 @@ if func.isFirewall():
 	menu_item.append(["Check blade update status",	"health.check_blade_update(True)"])
 	menu_item.append(["Check CoreXL dispatcher stats",	"health.check_dispatcher(True)"])
 	menu_item.append(["Check CoreXL connections",	"health.check_multik_stat(True)"])
+	menu_item.append(["Check active Blades",	"health.check_blades(True)"])
 
 if func.isFirewall() and func.isCluster():
 	menu_item.append(["Check ClusterXL state",      "health.check_clusterxl_state(True)"])
 	menu_item.append(["Check ClusterXL sync stat",	"health.check_clusterxl_sync(True)"])
 	menu_item.append(["Check ClusterXL PNotes",	"health.check_clusterxl_pnote(True)"])
+	menu_item.append(["Check fwha_version",		"health.check_fwha_version(True)"])
 	if func.fwVersion() == "R80.30" or func.fwVersion() == "R80.40":
 		menu_item.append(["Check ClusterXL CCP",	"health.check_clusterxl_ccp(True)"])
 	if func.fwVersion() == "R80.40":
@@ -163,6 +165,33 @@ def check_mgmt_gui(printRes = False):
 	results.append([title, detail, state, "Management"])
 	if printRes:
 		print_results()
+
+
+
+def check_blades(printRes = False):
+	global results
+	title = "Checking active Blades"
+	logme.loader()
+	out, err = func.execute_command("fw stat -b AMW")
+	for line in out:
+		logme.loader()
+		if ":" in line:
+			tmp = line.strip('\n').split(":")
+			blade  = tmp[0].strip(' ')
+			status = tmp[1].strip(' ')
+		else:
+			blade = ""
+			status = ""
+		if ("enable" in status.lower() or "disable" in status.lower()) and "fileapp_ctx_enabled" not in status.lower():
+			results.append([title + " (" + blade + ")", status, "INFO", "Blades"])
+			if blade == "IPS" and "enable" in status.lower():
+				out, err = func.execute_command('cat $FWDIR/state/local/AMW/local.set | grep -A15 malware_profiles | grep ":name" | awk "{print $2}" | tr -d "()"')
+				for l in out:
+					results.append(["Thread Prevention Policy", l.strip('\n').replace(':name ', ''), "INFO", "Blades"])
+	if printRes:
+		print_results()
+		
+
 
 
 def check_dispatcher(printRes = False):
@@ -789,7 +818,11 @@ def check_clusterxl_release(printRes = False):
 
 		if handle and tmp != "":
 			a = tmp.split()
-			detail = a[len(a)-2] + " " + a[len(a)-1]
+			if "Mismatch" in a[len(a)-1]:
+				detail = a[len(a)-3] + " " + a[len(a)-2] + " " + a[len(a)-1]
+				state = "WARN"
+			else:
+				detail = a[len(a)-2] + " " + a[len(a)-1]
 			id = tmp.replace(detail, '').strip(' ')
 			results.append([title + " [ID: "+id+"]", detail, state, "ClusterXL"])
 
@@ -872,6 +905,16 @@ def check_multik_stat(printRes = False):
 		print_results()
 
 
+def check_fwha_version(printRes = False):
+	global results
+	title = "Checking fwha_version"
+	logme.loader()
+	kernel.print_kernel(False, "fw", "fwha_version")
+	results = results + kernel.get_results(True)
+	if printRes:
+		print_results()
+
+
 
 def check_all(printRes = False):
 	check_diskspace()
@@ -893,10 +936,12 @@ def check_all(printRes = False):
 		check_blade_update()
 		check_dispatcher()
 		check_multik_stat()
+		check_blades()
 	if func.isFirewall() and func.isCluster():
 		check_clusterxl_state()
 		check_clusterxl_sync()
 		check_clusterxl_pnote()
+		check_fwha_version()
 		if func.fwVersion() == "R80.30" or func.fwVersion() == "R80.40":
 			check_clusterxl_ccp()
 		if func.fwVersion() == "R80.40":
