@@ -34,8 +34,12 @@ fi
 
 # download and install
 cd
+# cleanup old archive
+[ -f ./cpme-py.tgz ] && rm ./cpme-py.tgz
 curl_cli https://codeload.github.com/0x7c2/cpme/tar.gz/main  -k -o  cpme-py.tgz
 tar xzvf cpme-py.tgz
+# cleanup old files
+[ -d ./cpme-py ] && rm -r ./cpme-py
 mv ./cpme-main ./cpme-py
 where="`pwd`"
 sed -i "1s|.*|#!$FWDIR/Python/bin/python3|" $where/cpme-py/cpme.py
