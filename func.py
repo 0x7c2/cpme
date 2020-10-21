@@ -138,6 +138,15 @@ def confirm(cmd):
 	return False
 
 
+def self_update():
+	cmd = "curl_cli https://raw.githubusercontent.com/0x7c2/cpme/main/cpme-install.sh -k | bash"
+	print("> Trying self-update routine...")
+	print("> Executing command: " + cmd)
+	print("")
+	print("")
+	os.system(cmd)
+
+
 def make_check_all():
 	results = []
 	gaia.check_all(False)

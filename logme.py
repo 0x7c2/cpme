@@ -95,7 +95,7 @@ def html_category_descrpition(cat = ""):
 	categories["ClusterXL"]		= "Cluster related information"
 	categories["CPU"]		= "CPU usage, data obtained from cpview history"
 	categories["Kernel"]		= "Firewall kernel related settings"
-	categories["Licensing"]		= "Most complex topic, check poing licensing ;-)"
+	categories["Licensing"]		= "Most complex topic, check point licensing ;-)"
 	categories["Log Files"]		= "Try to find errors or any other warning in the log files"
 	categories["Memory"]		= "Memory usage and failed allocations, data obtained from cpview history"
 	categories["SecureXL"]		= "SecureXL configuration and statistics"
@@ -338,9 +338,37 @@ def info():
 	global version
 	print("CPme - CheckPoint Report/Analytic Tool, " + version + " (by S.Brecht, https://github.com/0x7c2/cpme/)")
 
+
+def info_version():
+	readme = open('README.md', 'r')
+	lines = readme.readlines()
+	output = False
+	for lineraw in lines:
+		line = lineraw.strip('\n').replace('`','')
+		if line == "## History":
+			output = True
+		if line == "## Donation":
+			output = False
+		if output:
+			if "##" in line:
+				tmp = line.replace('## ', '')
+				print("+" + (len(tmp)+2)*"-" + "+")
+				print("| " + tmp + " |")
+				print("+" + (len(tmp)+2)*"-" + "+")
+			else:
+				print(line)
+
+
 def usage():
-	print("Wrong command line argument!")
-	print("Exiting.")
+	print("")
+	print("usage: cpme              Run interactive mode")
+	print("   or: cpme [arguments]  With arguments, run non interactive mode")
+	print("")
+	print("Arguments:")
+	print("  --html                 Run all checks and create HTML report")
+	print("  --cli                  Run all checks and create CLI report")
+	print("  --update               Try to initiate self-update for CPme")
+	print("  --version              Print version and other information")
 	print("")
 
 

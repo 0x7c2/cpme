@@ -8,10 +8,6 @@
 # file that should have been included as part of this package.
 #
 
-print("")
-print("** CPme is starting, wait a second...")
-print("")
-
 import os, sys, sqlite3
 from array import array
 from subprocess import Popen, PIPE
@@ -138,5 +134,14 @@ else:
 		# printout cli report
 		logme.info()
 		func.make_report_cli()
+	elif sys.argv[1] == "--update":
+		# try selfupdate
+		logme.info()
+		func.self_update()
+	elif sys.argv[1] == "--version":
+		# display information
+		logme.info()
+		logme.info_version()
 	else:
+		logme.info()
 		logme.usage()
