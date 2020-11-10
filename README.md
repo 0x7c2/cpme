@@ -69,4 +69,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 ## Donation
 If you want to support this project, you can donate me ;-)  
 
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GZLQVAYV79AVQ&source=url)
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://paypal.me/0x7c2)
