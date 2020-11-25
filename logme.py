@@ -13,7 +13,7 @@ import func
 from operator import itemgetter
 import inspect
 
-version = "v0.22"
+version = "v0.23"
 width = 80
 loader_val = 0
 loader_char = ["-", "\\", "|", "/", "#"]

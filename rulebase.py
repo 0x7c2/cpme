@@ -250,6 +250,65 @@ def copy_access_rule(rule, alname, oldal = "", pos = "bottom"):
 	out, err = func.execute_command("mgmt_cli -s " + sessionid + " add access-rule layer " + alname + " position " + pos + " " + rtxt, True)
 	modified = True
 
+
+def display_rule_content(arr, row, maxlen):
+	if len(arr) <= row:
+		return ""
+	return arr[row][:maxlen]
+
+def display_rule(uid, enabled, rulename, rulesrc, ruledst, rulesvc, rulecomments, lastmod, lastmoduser):
+	screen_width = 80
+	rule_rows = 0
+	rulesrc_a = rulesrc.split(",")
+	ruledst_a = ruledst.split(",")
+	rulesvc_a = rulesvc.split(",")
+	if len(rulesrc_a)> rule_rows: rule_rows = len(rulesrc_a)
+	if len(ruledst_a)> rule_rows: rule_rows = len(ruledst_a)
+	if len(rulesvc_a)> rule_rows: rule_rows = len(rulesvc_a)
+	print("+" + (screen_width-2)*"-" + "+")
+	print("| ACTIVE | NAME" + 10*" " + "| SOURCE" + 10*" " + " | DESTINATION" + 6*" " + " | SERVICE" + 5*" " + " |")
+	print("+" + (screen_width-2)*"-" + "+")
+	for i in range(rule_rows):
+
+		# empty row
+		row = ""
+
+		# column ACTIVE
+		if i == 0:
+			row = row + "| " + enabled + (7-len(enabled))*" "
+		else:
+			row = row + "|" + 8*" "
+
+		# column NAME
+		if i == 0:
+			row = row + "| " + rulename[:14] + (14-len(rulename))*" "
+		else:
+			row = row + "|" + 15*" "
+
+		# column SOURCE
+		c_source = display_rule_content(rulesrc_a, i, 17)
+		row = row + "| " + c_source + (17-len(c_source))*" "
+
+		# column DESTINATION
+		c_destination = display_rule_content(ruledst_a, i, 18)
+		row = row + "| " + c_destination + (18-len(c_destination))*" "
+
+		# column SERVICE
+		c_service = display_rule_content(rulesvc_a, i, 13)
+		row = row + "| " + c_service + (13-len(c_service))* " " + "|"
+
+		print(row)
+
+	print("+" + (screen_width-2)*"-" + "+")
+	print("| Additional information:")
+	print("|--> Rule UID      : " + uid)
+	print("|--> Last Modified : " + lastmod)
+	print("|--> Last Modifier : " + lastmoduser)
+	print("|--> Comments      : " + rulecomments)
+	print("+" + (screen_width-2)*"-" + "+")
+
+
+
 def disable_or_move_rules(confirm = True, accesslayer = [], disableZero = False, moveDisabled = False):
 	if len(accesslayer)<1:
 		accesslayer = select_access_layer()
@@ -279,15 +338,15 @@ def disable_or_move_rules(confirm = True, accesslayer = [], disableZero = False,
 					if newlayer == "":
 						newlayer = create_access_layer()
 				if processRule:
-					print("rule uid          : " + rule['uid'])
-					print("rule enabled      : " + str(rule['enabled']))
+					# print("rule uid          : " + rule['uid'])
+					# print("rule enabled      : " + str(rule['enabled']))
 					rname = ""
 					if 'name' in rule:
 						rname = rule['name']
-					print("rule name         : " + rname)
-					print("rule last modifiy : " + rule['meta-info']['last-modify-time']['iso-8601'])
-					print("rule last modifier: " + rule['meta-info']['last-modifier'])
-					print("rule comments     : " + rule['comments'])
+					# print("rule name         : " + rname)
+					# print("rule last modifiy : " + rule['meta-info']['last-modify-time']['iso-8601'])
+					# print("rule last modifier: " + rule['meta-info']['last-modifier'])
+					# print("rule comments     : " + rule['comments'])
 					src_txt = ""
 					for src in rule['source']:
 						if src_txt != "":
@@ -295,7 +354,7 @@ def disable_or_move_rules(confirm = True, accesslayer = [], disableZero = False,
 						for dict in data['objects-dictionary']:
 							if dict['uid'] == src:
 								src_txt = src_txt + dict['name']
-					print("rule source       : " + src_txt)
+					# print("rule source       : " + src_txt)
 					dst_txt = ""
 					for dst in rule['destination']:
 						if dst_txt != "":
@@ -303,7 +362,7 @@ def disable_or_move_rules(confirm = True, accesslayer = [], disableZero = False,
 						for dict in data['objects-dictionary']:
 							if dict['uid'] == dst:
 								dst_txt = dst_txt + dict['name']
-					print("rule destination  : " + dst_txt)
+					# print("rule destination  : " + dst_txt)
 					srv_txt = ""
 					for srv in rule['service']:
 						if srv_txt != "":
@@ -311,11 +370,13 @@ def disable_or_move_rules(confirm = True, accesslayer = [], disableZero = False,
 						for dict in data['objects-dictionary']:
 							if dict['uid'] == srv:
 								srv_txt = srv_txt + dict['name']
-					print("rule service      : " + srv_txt)
+					# print("rule service      : " + srv_txt)
+					display_rule(rule['uid'], str(rule['enabled']), rname, src_txt, dst_txt, srv_txt, rule['comments'], rule['meta-info']['last-modify-time']['iso-8601'], rule['meta-info']['last-modifier'])
 					print("")
 					s = input("Should this rule modified? [Y/n/c]: ")
 					if s.lower() == "c":
-						break
+						api_logout()
+						return
 					if s.lower() == "y" or s.lower() == "":
 						print("modifing rule " + rule['uid'])
 						if moveDisabled:
