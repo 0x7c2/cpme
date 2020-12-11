@@ -36,7 +36,23 @@ fi
 cd
 # cleanup old archive
 [ -f ./cpme-py.tgz ] && rm ./cpme-py.tgz
-curl_cli https://codeload.github.com/0x7c2/cpme/tar.gz/main  -k -o  cpme-py.tgz
+
+# Added by olejak 
+if [ "`host -t A codeload.github.com >/dev/null ; echo $?`" == "0" ]
+then
+	echo
+	echo "Starting download of tgz file from Github..."
+	echo
+	curl_cli https://codeload.github.com/0x7c2/cpme/tar.gz/main  -# -k -o cpme-py.tgz
+	echo
+else
+	echo
+	echo "Can't resolve codeload.github.com"
+	echo "Please check DNS settings and/or access to codeload.github.com"
+	echo
+	exit 1
+fi
+
 tar xzvf cpme-py.tgz
 # cleanup old files
 [ -d ./cpme-py ] && rm -r ./cpme-py

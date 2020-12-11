@@ -139,7 +139,8 @@ def confirm(cmd):
 
 
 def self_update():
-	cmd = "curl_cli https://raw.githubusercontent.com/0x7c2/cpme/main/cpme-install.sh -k | bash"
+	cmd = "curl_cli https://raw.githubusercontent.com/0x7c2/cpme/main/cpme-install.sh -k -# | bash"
+	print("")
 	print("> Trying self-update routine...")
 	print("> Executing command: " + cmd)
 	print("")
