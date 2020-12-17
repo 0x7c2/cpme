@@ -7,7 +7,7 @@ for R80.20 and above.
 
 ## Installation (Manual)
 ```
-curl_cli https://codeload.github.com/0x7c2/cpme/tar.gz/main -k -o cpme-py.tgz
+curl_cli https://codeload.github.com/0x7c2/cpme/tar.gz/main -k -o -# cpme-py.tgz
 tar xzvf cpme-py.tgz
 sed -i "1s|.*|#!$FWDIR/Python/bin/python3|" cpme-main/cpme.py
 chmod +x cpme-main/cpme.py
