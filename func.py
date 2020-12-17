@@ -239,7 +239,7 @@ def isFWUserMode():
 
 if fwVersion() == "R80.20" or fwVersion() == "R80.30":
 	cpview_database = "/var/log/CPView_history/CPViewDB.dat"
-if fwVersion() == "R80.40":
+if fwVersion() == "R80.40" or fwVersion() == "R81":
 	cpview_database = "/var/log/opt/CPshrd-" + fwVersion() + "/cpview_services/cpview_services.dat"
 
 
